@@ -1,0 +1,55 @@
+union _Entity = User
+
+directive @include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+directive @skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+directive @deprecated(reason: String) on FIELD_DEFINITION | ENUM_VALUE
+
+" An actor in the system"
+interface Actor {
+  " The name of the character."
+  name: String
+}
+
+type Selfie {
+  id: String
+  name: String
+}
+
+type User @key(fields: "id") {
+  " Friends of this user."
+  friends: [Int!]!
+  """
+  The database "ID".
+  """
+  id: String!
+  name: String
+  selfie: Selfie
+}
+
+type _Service {
+  sdl: String
+}
+
+type Query {
+  _entities(representations: [_Any!]!): _Entity
+  _service: _Service!
+  user(id: String): User
+  users: [User]
+}
+
+
+
+#### Apollo Federation ####
+
+scalar _Any
+scalar _FieldSet
+
+directive @external on FIELD_DEFINITION
+directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
+directive @provides(fields: _FieldSet!) on FIELD_DEFINITION
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+
+# this is an optional directive discussed below
+directive @extends on OBJECT | INTERFACE
